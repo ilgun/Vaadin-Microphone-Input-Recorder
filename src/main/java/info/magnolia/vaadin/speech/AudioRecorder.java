@@ -8,20 +8,27 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 
+import elemental.json.JsonArray;
+import elemental.json.JsonString;
+
 @JavaScript({"recorder.js", "audiorecorder_connector.js", "jquery-3.2.0.js"})
 public class AudioRecorder extends AbstractJavaScriptComponent {
 
     public AudioRecorder() {
         this.addFunction("stopServerRecording", (JavaScriptFunction) arguments -> {
-            getState().setFileName(arguments.getString(0));
+            final byte[] wavBinary = arguments.getString(0).getBytes();
             for (ValueChangeListener listener : listeners) {
-                listener.valueChange(getState().getFileName());
+                listener.valueChange(wavBinary);
             }
         });
     }
 
+    private byte[] toByteArray(final JsonArray wavBytes) {
+        return wavBytes.toString().getBytes();
+    }
+
     public interface ValueChangeListener extends Serializable {
-        void valueChange(String changedValue);
+        void valueChange(byte[] wavBinary);
     }
 
     private List<ValueChangeListener> listeners = Lists.newArrayList();

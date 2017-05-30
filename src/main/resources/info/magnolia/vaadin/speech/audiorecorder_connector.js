@@ -1,3 +1,5 @@
+console.log('Connector fckn LOADED!');
+
 window.info_magnolia_vaadin_speech_AudioRecorder = function () {
     var element = $(this.getElement());
     var self = this;
@@ -5,22 +7,23 @@ window.info_magnolia_vaadin_speech_AudioRecorder = function () {
     var audio_context;
     var recorder;
 
-    try {
-        // webkit shim
+        // browser prefix shims
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
         window.URL = window.URL || window.webkitURL;
 
         audio_context = new AudioContext;
         console.log('Audio context set up.');
         console.log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
-    } catch (e) {
-        alert('No web audio support in this browser!');
-    }
 
-    navigator.getUserMedia({audio: true}, startUserMedia, function (e) {
-        console.log('No live audio input: ' + e);
-    });
+    try {
+        navigator.getUserMedia({audio: true}, startUserMedia, function (e) {
+            console.log('No live audio input: ' + e);
+        });
+    } catch (e) {
+        console.error('No web audio support in this browser!');
+        throw e;
+    }
 
 
     function startUserMedia(stream) {
@@ -34,28 +37,27 @@ window.info_magnolia_vaadin_speech_AudioRecorder = function () {
         console.log('Recorder initialised.');
     }
 
-    function createDownloadLink(callback) {
-        recorder && recorder.exportWAV(function (blob) {
-            var url = URL.createObjectURL(blob);
-            callback(url);
-        });
-    }
-
     this.startRecording = function () {
         recorder && recorder.record();
         console.log('Recording...');
     };
 
     this.stopRecording = function () {
-        recorder && recorder.stop();
+        if (!recorder) return;
+
+        recorder.stop();
         console.log('Stopped recording.');
-        createDownloadLink(function (url) {
-            var link = window.document.createElement('a');
-            link.href = url;
-            link.download = new Date().getUTCMilliseconds() + '.wav';
-            link.click();
-            self.stopServerRecording(link.download);
-            recorder.clear();
+
+        recorder.exportWAV(function (blob) {
+            var reader = new FileReader();
+
+            reader.addEventListener('loadend', function() {
+                // var wavBytes = new Int8Array(reader.result);
+                self.stopServerRecording(reader.result);
+                recorder.clear();
+            });
+
+            reader.readAsText(blob, "UTF-8");
         });
     };
 };
