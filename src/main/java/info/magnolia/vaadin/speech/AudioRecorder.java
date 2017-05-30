@@ -1,11 +1,7 @@
 package info.magnolia.vaadin.speech;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.Serializable;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.google.common.collect.Lists;
 import com.vaadin.annotations.JavaScript;
@@ -13,8 +9,6 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 
 import elemental.json.JsonArray;
-import elemental.json.JsonString;
-import elemental.json.impl.JreJsonNumber;
 
 @JavaScript({"recorder.js", "audiorecorder_connector.js", "jquery-3.2.0.js"})
 public class AudioRecorder extends AbstractJavaScriptComponent {
