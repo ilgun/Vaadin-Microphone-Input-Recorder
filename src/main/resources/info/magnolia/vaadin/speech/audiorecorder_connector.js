@@ -52,12 +52,13 @@ window.info_magnolia_vaadin_speech_AudioRecorder = function () {
             var reader = new FileReader();
 
             reader.addEventListener('loadend', function() {
-                // var wavBytes = new Int8Array(reader.result);
-                self.stopServerRecording(reader.result);
+                var wavBytes = new Int8Array(reader.result);
+                var wavDataArray = new Array(...wavBytes);
+                self.stopServerRecording(wavDataArray);
                 recorder.clear();
             });
 
-            reader.readAsText(blob, "UTF-8");
+            reader.readAsArrayBuffer(blob);
         });
     };
 };
