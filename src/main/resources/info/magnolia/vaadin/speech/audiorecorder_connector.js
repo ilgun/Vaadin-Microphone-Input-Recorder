@@ -54,7 +54,7 @@ window.info_magnolia_vaadin_speech_AudioRecorder = function () {
             reader.addEventListener('loadend', function() {
                 var wavBytes = new Int8Array(reader.result);
                 var wavDataArray = [...wavBytes];
-                self.stopServerRecording(wavDataArray);
+                element.$server.stopServerRecording(wavDataArray);
                 recorder.clear();
             });
 
